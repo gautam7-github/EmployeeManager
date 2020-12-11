@@ -27,11 +27,11 @@ void EMPData::set_lname(string Lname)
 {
     this->lname = Lname;
 }
-unsigned int EMPData::get_salary()
+string EMPData::get_salary()
 {
     return salary;
 }
-void EMPData::set_salary(unsigned int Salary)
+void EMPData::set_salary(string Salary)
 {
     this->salary = Salary;
 }

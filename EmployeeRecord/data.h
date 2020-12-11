@@ -7,7 +7,7 @@ private:
     int eID;
     string fname;
     string lname;
-    unsigned int salary;
+    string salary;
     string dept;
 
 public:
@@ -24,8 +24,8 @@ public:
     // setter
     void set_lname(string);
     // getter
-    unsigned int get_salary();
+    string get_salary();
     // setter
-    void set_salary(unsigned int);
+    void set_salary(string);
     // getter
 };

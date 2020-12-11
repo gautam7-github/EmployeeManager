@@ -7,18 +7,19 @@ class RUNAPP_iEDM
 private:
     // UserID and Password
     string uid, paswd;
-    void adminCLASS(string AName)
+    void adminCLASS(string AName, string Apass)
     {
+        system("cls");
         admin SUDO;
-        SUDO.adminMENU(uid);
+        SUDO.adminMENU(AName, Apass);
     }
     bool get_loginDetails(string uid, string paswd)
     {
         string loginUID, loginPaswd, AdminStatus;
-
+        int i = 0;
         bool flag = false;
         ifstream file;
-        file.open("login.csv", ios::in);
+        file.open("data/login.csv", ios::in);
 
         char delim = ',';
         vector<string> row;
@@ -26,6 +27,11 @@ private:
 
         while (getline(file, line))
         {
+            if (i == 0)
+            {
+                ++i;
+                continue;
+            }
             row.clear();
             stringstream ss(line);
 
@@ -40,6 +46,7 @@ private:
             if (loginUID == uid && loginPaswd == paswd && AdminStatus == "admin")
             {
                 flag = true;
+                break;
             }
         }
         row.clear();
@@ -49,28 +56,41 @@ private:
     }
 
 public:
+    void UI_mainBranding()
+    {
+        cout << R"(
+
+                  _   ______   _____    __  __    _____ 
+                 (_) |  ____| |  __ \  |  \/  |  / ____|
+                  _  | |__    | |  | | | \  / | | (___  
+                 | | |  __|   | |  | | | |\/| |  \___ \ 
+                 | | | |____  | |__| | | |  | |  ____) |
+                 |_| |______| |_____/  |_|  |_| |_____/ 
+        )" << endl;
+    }
     void run()
     {
         bool flag = true;
         do
         {
-            cout << "LOGIN\n\n\n";
+            system("cls");
+            UI_mainBranding();
+            cout << setw(40) << "--- LOGIN ---\n\n\n";
 
-            cout << "USER ID :: ";
+            cout << setw(20) << "| " << setw(20) << "USER ID  :: " << setw(10);
             cin >> uid;
-            cout << "PASSWORD ::";
+            cout << setw(20) << "| " << setw(20) << "PASSWORD :: " << setw(10);
             cin >> paswd;
 
             if (get_loginDetails(uid, paswd))
             {
-                adminCLASS(uid);
+                adminCLASS(uid, paswd);
                 flag = false;
             }
             else
             {
                 cout << "WRONG CREDENTIALS...\n";
                 cout << "TRY AGAIN...\n";
-                continue;
             }
 
         } while (flag);

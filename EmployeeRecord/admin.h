@@ -5,8 +5,9 @@ class admin : public EMPData
 {
 private:
     vector<EMPData> empl;
+    vector<string> adminData;
     // parameters - EID, FNAME , LNAME , SALARY
-    void setter(int, string, string, unsigned int);
+    void setter(int, string, string, string);
     void filereader();
     // parameter - EID to delete employee
     // data in record
@@ -19,8 +20,10 @@ private:
     bool alreadyExists(int);
     // ------------------------------------
     // ------------------------------------
+    void UI_mainBranding();
+
 public:
-    void adminMENU(string);
+    void adminMENU(string, string);
     void basicDET_SET();
     void basicDET_GET();
     void basicDET_deleteEMP();

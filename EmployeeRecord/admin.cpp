@@ -5,9 +5,21 @@ using namespace std;
 
 // vector to store instances of EMPData Class
 std::vector<admin::EMPData> empl;
+void admin::UI_mainBranding()
+{
+    cout << R"(
 
+                  _   ______   _____    __  __    _____ 
+                 (_) |  ____| |  __ \  |  \/  |  / ____|
+                  _  | |__    | |  | | | \  / | | (___  
+                 | | |  __|   | |  | | | |\/| |  \___ \ 
+                 | | | |____  | |__| | | |  | |  ____) |
+                 |_| |______| |_____/  |_|  |_| |_____/ 
+        )"
+         << endl;
+}
 // parameters - EID, FNAME , LNAME , SALARY
-void admin::setter(int EID, string FN, string LN, unsigned int SL)
+void admin::setter(int EID, string FN, string LN, string SL)
 {
     EMPData *E = new (nothrow) EMPData;
     E->set_eid(EID);
@@ -17,7 +29,7 @@ void admin::setter(int EID, string FN, string LN, unsigned int SL)
     empl.push_back(*E);
 
     ofstream file;
-    file.open("database.csv", ios::out | ios::app);
+    file.open("data/database.csv", ios::out | ios::app);
     //write to csv file
     if (alreadyExists(EID))
     {
@@ -33,8 +45,9 @@ void admin::setter(int EID, string FN, string LN, unsigned int SL)
 }
 void admin::filereader()
 {
+    bool skipRow0 = true;
     ifstream file;
-    file.open("database.csv", ios::in);
+    file.open("data/database.csv", ios::in);
 
     int num;
     char delim = ',';
@@ -44,6 +57,11 @@ void admin::filereader()
     cout << "\n\n";
     while (getline(file, line))
     {
+        if (skipRow0 == true)
+        {
+            skipRow0 = false;
+            continue;
+        }
         row.clear();
         stringstream ss(line);
 
@@ -51,8 +69,6 @@ void admin::filereader()
         {
             row.push_back(word);
         }
-        num = stoi(row[0]);
-
         cout << "-----------------------" << endl;
         cout << "| EMP ID     : " << row[0] << endl;
         cout << "| EMP NAME   : " << row[1] << " " << row[2] << endl;
@@ -64,14 +80,16 @@ void admin::filereader()
 }
 void admin::CSV_delete(int EID)
 {
+    // row skipper
+    bool skipRow0 = true;
     // Open FIle pointers
     fstream fin, fout;
 
     // Open the existing file
-    fin.open("database.csv", ios::in);
+    fin.open("data/database.csv", ios::in);
 
     // Create a new file to store the non-deleted data
-    fout.open("databasenew.csv", ios::out);
+    fout.open("data/databasenew.csv", ios::out);
 
     int readEID, count = 0, i;
     int index;
@@ -84,6 +102,11 @@ void admin::CSV_delete(int EID)
     // add all other data to the new file
     while (!fin.eof())
     {
+        if (skipRow0 == true)
+        {
+            skipRow0 = false;
+            continue;
+        }
         // clear the vector
         row.clear();
         getline(fin, line);
@@ -126,17 +149,18 @@ void admin::CSV_delete(int EID)
     fout.close();
 
     // removing the existing file
-    remove("database.csv");
+    remove("data/database.csv");
 
     // renaming the new file with the existing file name
-    rename("databasenew.csv", "database.csv");
+    rename("data/databasenew.csv", "data/database.csv");
 }
 bool admin::filesearcher(int searchEID)
 {
     int eid;
     bool flag = false;
+    bool skipRow0 = true;
     ifstream file;
-    file.open("database.csv", ios::in);
+    file.open("data/database.csv", ios::in);
 
     char delim = ',';
     vector<string> row;
@@ -145,6 +169,11 @@ bool admin::filesearcher(int searchEID)
     cout << "\n\n";
     while (getline(file, line))
     {
+        if (skipRow0 == true)
+        {
+            skipRow0 = false;
+            continue;
+        }
         row.clear();
         stringstream ss(line);
 
@@ -170,10 +199,11 @@ bool admin::filesearcher(int searchEID)
 }
 bool admin::alreadyExists(int searchEID)
 {
+    bool skipRow0 = true;
     int eid;
     bool flag = false;
     ifstream file;
-    file.open("database.csv", ios::in);
+    file.open("data/database.csv", ios::in);
 
     char delim = ',';
     vector<string> row;
@@ -181,6 +211,11 @@ bool admin::alreadyExists(int searchEID)
 
     while (getline(file, line))
     {
+        if (skipRow0 == true)
+        {
+            skipRow0 = false;
+            continue;
+        }
         row.clear();
         stringstream ss(line);
 
@@ -201,8 +236,11 @@ bool admin::alreadyExists(int searchEID)
 }
 // ------------------------------------
 // ------------------------------------
-void admin::adminMENU(string AdminName)
+void admin::adminMENU(string AdminName, string AdminPassword)
 {
+    adminData.resize(2);
+    adminData[0] = AdminName;
+    adminData[1] = AdminPassword;
     int choice;
     bool flag = true;
     while (flag)
@@ -212,7 +250,7 @@ void admin::adminMENU(string AdminName)
         cout << "3. DELETE RECORD \n";
         cout << "4. SEARCH RECORD \n";
         cout << "OTHER -> EXIT \n";
-        cout << "$" << AdminName << "$::";
+        cout << "$" << adminData[0] << "$::";
         cin >> choice;
 
         switch (choice)
@@ -237,27 +275,27 @@ void admin::adminMENU(string AdminName)
 }
 void admin::basicDET_SET()
 {
+    int EID;
     string *FN = new (nothrow) string;
     string *LN = new (nothrow) string;
-    unsigned int *SL = new unsigned int;
-    int EID;
+    string *SL = new (nothrow) string;
     // buffer clearer
     cin.sync();
     // e ID
-    cout << "EID : ";
+    cout << "EMP ID     : ";
     cin >> EID;
     // clearing buffer
     cin.clear();
     cin.ignore();
     // first name
-    cout << "FNAME : ";
+    cout << "FIRST NAME : ";
     getline(cin, *FN);
     // last name
-    cout << "LNAME : ";
+    cout << "LAST NAME  : ";
     getline(cin, *LN);
     // salary
-    cout << "SLRY  : ";
-    cin >> *SL;
+    cout << "SALARY     : ";
+    getline(cin, *SL);
     // calls setter method
     admin::setter(EID, *FN, *LN, *SL);
     delete FN, LN, SL;
@@ -267,10 +305,10 @@ void admin::basicDET_SET()
 void admin::basicDET_GET()
 {
     string passwd;
-    cout << "ENTER PASSWORD TO ACCESS ALL DATA :: ";
+    cout << "CONFIRM PASSWORD TO ACCESS ALL DATA :: ";
     cin >> passwd;
 
-    if (passwd == "1234")
+    if (passwd == adminData[1])
         filereader();
 }
 void admin::basicDET_deleteEMP()
@@ -278,8 +316,14 @@ void admin::basicDET_deleteEMP()
     int EID;
     cout << "Delete using EID :: ";
     cin >> EID;
+    string passwd;
+    cout << "CONFIRM PASSWORD TO DELETE DATA OF ";
+    cout << "EMPLOYEE ID : " << EID;
+    cin >> passwd;
+
     // calls deleter method
-    CSV_delete(EID);
+    if (passwd == adminData[1])
+        CSV_delete(EID);
 }
 void admin::basicDET_SEARCH()
 {
